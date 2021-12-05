@@ -9,7 +9,7 @@ from sqlalchemy.orm.session import Session
 from ..crud import add_to_history
 from ..database import get_database
 from ..schemas import RedditPicture, RedditPost
-from ..settings import Settings, get_settings
+from ..settings import Listing, Settings, get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +18,9 @@ router = APIRouter()
 
 async def fetch_subreddit(subreddit: str, listing: str):
     listing_url = f"http://www.reddit.com/r/{subreddit}/{listing}.json"
+    params = {"limit": "100"}  # reddit's default is only 25, 100 is max
     async with aiohttp.ClientSession() as session:
-        async with session.get(listing_url) as response:
+        async with session.get(listing_url, params=params) as response:
             if response.status == 200:
                 return await response.json()
 
@@ -35,7 +36,7 @@ def get_picture_posts(response: dict) -> List[RedditPost]:
 @router.get("/random", response_model=RedditPicture)
 async def random(
     sub: Optional[str] = None,
-    listing: Optional[str] = None,
+    listing: Optional[Listing] = None,
     db: Session = Depends(get_database),
     config: Settings = Depends(get_settings),
 ):
