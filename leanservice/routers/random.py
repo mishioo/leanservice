@@ -38,4 +38,4 @@ async def random(db: Session = Depends(get_database)):
     fetched = await fetch_subreddit("memes")
     posts = get_picture_posts(fetched)
     post = choice(posts)
-    return add_to_history(db, post)
+    return await add_to_history(db, post)
