@@ -1,8 +1,6 @@
 import logging
-import uuid
-from datetime import datetime
 from random import choice
-from typing import List
+from typing import List, Optional
 
 import aiohttp
 from fastapi import APIRouter, Depends
@@ -36,10 +34,14 @@ def get_picture_posts(response: dict) -> List[RedditPost]:
 
 @router.get("/random", response_model=RedditPicture)
 async def random(
-    db: Session = Depends(get_database), config: Settings = Depends(get_settings)
+    sub: Optional[str] = None,
+    listing: Optional[str] = None,
+    db: Session = Depends(get_database),
+    config: Settings = Depends(get_settings),
 ):
     fetched = await fetch_subreddit(
-        subreddit=config.DEFAULT_SUBREDDIT, listing=config.DEFAULT_LISTING
+        subreddit=sub or config.DEFAULT_SUBREDDIT,
+        listing=listing or config.DEFAULT_LISTING,
     )
     posts = get_picture_posts(fetched)
     post = choice(posts)
