@@ -19,7 +19,7 @@ class RedditPost(BaseModel):
 
     @property
     def post_url(self):
-        return f"https://www.reddit.com/{self.permalink}"
+        return f"https://www.reddit.com{self.permalink}"
 
 
 class RedditPicture(BaseModel):
