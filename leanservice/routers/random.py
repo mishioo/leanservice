@@ -1,3 +1,4 @@
+"""Endpoint that loads a random picture from reddit."""
 import logging
 from random import choice
 from typing import List, Optional
@@ -16,7 +17,21 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-async def fetch_subreddit(subreddit: str, listing: str):
+async def fetch_subreddit(subreddit: str, listing: str) -> dict:
+    """Fetches 100 posts from given listing, from given subreddit.
+
+    Parameters
+    ----------
+    subreddit : str
+        Subreddit's name. This subreddit will be fetched for random picture post.
+    listing : str
+        Type of reddit's listing (how posts should be sorted): new, hot, and so on.
+
+    Returns
+    -------
+    dict
+        Reddit's response in JSON format, converted to Pyhton's dict.
+    """
     listing_url = f"http://www.reddit.com/r/{subreddit}/{listing}.json"
     params = {"limit": "100"}  # reddit's default is only 25, 100 is max
     async with aiohttp.ClientSession() as session:
@@ -26,13 +41,28 @@ async def fetch_subreddit(subreddit: str, listing: str):
 
 
 def get_picture_posts(response: dict) -> List[RedditPost]:
-    listing = response["data"]["children"]
+    """Filter posts fetched to keep only those with a picture.
+
+    Parameters
+    ----------
+    response : dict
+        Reddit's response in JSON format, converted to Pyhton's dict.
+
+    Returns
+    -------
+    list of RedditPost
+        Posts that contain a picture.
+    """
+    listing = response["data"]["children"]  # location of actual list of posts
+    # convert all posts to `RedditPost` instances
+    # not particularly efficient, but convenient
     posts_fetched = (RedditPost(**item["data"]) for item in listing)
     picture_posts = [post for post in posts_fetched if post.is_picture]
     logger.debug(f"Fetched {len(picture_posts)} picture posts.")
     return picture_posts
 
 
+# TODO: handle empty lists and non-existant subreddits
 @router.get("/random", response_model=RedditPicture)
 async def random(
     sub: Optional[str] = None,
@@ -40,10 +70,13 @@ async def random(
     db: Session = Depends(get_database),
     config: Settings = Depends(get_settings),
 ):
+    """/random endpoint's GET method.
+    Returns a JSON representation of random picture from reddit.
+    """
     fetched = await fetch_subreddit(
         subreddit=sub or config.DEFAULT_SUBREDDIT,
         listing=listing or config.DEFAULT_LISTING,
     )
     posts = get_picture_posts(fetched)
-    post = choice(posts)
+    post = choice(posts)  # chose at random
     return await add_to_history(db, post)

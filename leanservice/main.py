@@ -16,6 +16,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
+    """Create tables if they don't exist."""
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
 

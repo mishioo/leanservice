@@ -12,4 +12,7 @@ router = APIRouter()
 
 @router.get("/history", response_model=List[RedditPicture])
 async def history(db: Session = Depends(get_database)):
+    """/history endpoint's GET method.
+    Returns a JSON representation of all pictures drawn so far.
+    """
     return await get_history(db)

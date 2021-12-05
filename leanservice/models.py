@@ -1,3 +1,4 @@
+"""Models (only one, actually) for communication with the database."""
 import uuid
 from datetime import datetime
 
@@ -7,6 +8,8 @@ from .database import Base
 
 
 class RedditPicture(Base):
+    """Represents a picture post in the database."""
+
     __tablename__ = "history"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))

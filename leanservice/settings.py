@@ -1,3 +1,4 @@
+"""Defines and exposes app's configuration."""
 from enum import Enum
 from functools import lru_cache
 
@@ -13,7 +14,7 @@ class Env(Enum):
 
 
 class Listing(Enum):
-    """Provides listing types provided by reddit's API."""
+    """Listing types provided by reddit's API."""
 
     NEW = "new"
     HOT = "hot"
@@ -37,6 +38,32 @@ class Listing(Enum):
 
 
 class Settings(BaseSettings):
+    """Defines app's configuration.
+
+    Attributes
+    ----------
+    DEFAULT_SUBREDDIT : str
+            Default subreddit, from which app should draw a picture post.
+    DEFAULT_LISTING : Listing
+        Default listing, from which app should draw a picture post.
+        Should be a member of `Listing` enumeration, but string will also be accepted
+        if it can be converted to `Listing`'s member.
+    DATABASE_URL : str
+        Address of the database used by app.
+    ENV : Env
+        Defines type of environment that app runs in.
+        Should be a member of `Env` enumeration, but string will also be accepted
+        if it can be converted to `Env`'s member.
+
+    Notes
+    -----
+    Loads ".env" file with variables declaration, it should be located in working
+    directory. Actual environment variables are also fetched, in fact they take
+    precedence over ".env" file declarations.
+    Also, variables in ".env" or environment variables that are not defined as this
+    class' attribute will be ignored.
+    """
+
     DEFAULT_SUBREDDIT: str = "dankmemes"
     DEFAULT_LISTING: Listing = Listing.NEW
     DATABASE_URL: str
@@ -48,4 +75,11 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings():
+    """Returns application's settings as `pydantic.BaseSettings` instance.
+
+    Notes
+    -----
+    This function is available for FastAPI's dependency injection.
+    Decorated with `functools.lru_cache`, always returns original object.
+    """
     return Settings()
