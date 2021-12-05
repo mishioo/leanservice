@@ -7,7 +7,7 @@ from typing import List
 import aiohttp
 from fastapi import APIRouter
 
-from ..models import RedditPicture, RedditPost
+from ..schemas import RedditPicture, RedditPost
 from . import history
 
 logger = logging.getLogger(__name__)
