@@ -1,18 +1,15 @@
 import logging
-import os
 
-from dotenv import load_dotenv
 from fastapi import FastAPI
-
-load_dotenv()
 
 from .database import Base, engine
 from .routers import history, random
+from .settings import Env, get_settings
 
-logging_level = (
-    logging.DEBUG if os.environ.get("ENV", None) == "PROD" else logging.WARNING
-)
-logging.basicConfig(level=logging_level)
+config = get_settings()
+if config.ENV is Env.DEV:
+    logging.basicConfig(level=logging.DEBUG)
+
 
 app = FastAPI()
 

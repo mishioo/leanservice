@@ -11,14 +11,15 @@ from sqlalchemy.orm.session import Session
 from ..crud import add_to_history
 from ..database import get_database
 from ..schemas import RedditPicture, RedditPost
+from ..settings import Settings, get_settings
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-async def fetch_subreddit(subreddit: str):
-    listing_url = f"http://www.reddit.com/r/{subreddit}/new.json"
+async def fetch_subreddit(subreddit: str, listing: str):
+    listing_url = f"http://www.reddit.com/r/{subreddit}/{listing}.json"
     async with aiohttp.ClientSession() as session:
         async with session.get(listing_url) as response:
             if response.status == 200:
@@ -34,8 +35,12 @@ def get_picture_posts(response: dict) -> List[RedditPost]:
 
 
 @router.get("/random", response_model=RedditPicture)
-async def random(db: Session = Depends(get_database)):
-    fetched = await fetch_subreddit("memes")
+async def random(
+    db: Session = Depends(get_database), config: Settings = Depends(get_settings)
+):
+    fetched = await fetch_subreddit(
+        subreddit=config.DEFAULT_SUBREDDIT, listing=config.DEFAULT_LISTING
+    )
     posts = get_picture_posts(fetched)
     post = choice(posts)
     return await add_to_history(db, post)
