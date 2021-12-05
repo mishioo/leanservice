@@ -1,13 +1,15 @@
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm.session import Session
 
+from ..crud import get_history
+from ..database import get_database
 from ..schemas import RedditPicture
 
 router = APIRouter()
-router.history = []
 
 
 @router.get("/history", response_model=List[RedditPicture])
-async def history():
-    return router.history
+async def history(db: Session = Depends(get_database)):
+    return get_history(db)

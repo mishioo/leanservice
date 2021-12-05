@@ -5,10 +5,12 @@ from random import choice
 from typing import List
 
 import aiohttp
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm.session import Session
 
+from ..crud import add_to_history
+from ..database import get_database
 from ..schemas import RedditPicture, RedditPost
-from . import history
 
 logger = logging.getLogger(__name__)
 
@@ -32,16 +34,8 @@ def get_picture_posts(response: dict) -> List[RedditPost]:
 
 
 @router.get("/random", response_model=RedditPicture)
-async def random():
+async def random(db: Session = Depends(get_database)):
     fetched = await fetch_subreddit("memes")
     posts = get_picture_posts(fetched)
     post = choice(posts)
-    picture = RedditPicture(
-        url=post.url,
-        post_url=post.post_url,
-        time=datetime.now(),
-        picture_id=uuid.uuid4(),
-    )
-    history.router.history.append(picture)
-    return picture
-
+    return add_to_history(db, post)

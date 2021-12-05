@@ -7,11 +7,11 @@ from pydantic.networks import HttpUrl
 
 
 class RedditPost(BaseModel):
-    class Config:
-        extra = Extra.ignore
-
     permalink: str
     url: Optional[HttpUrl] = None
+
+    class Config:
+        extra = Extra.ignore
 
     @property
     def is_picture(self):
@@ -25,6 +25,7 @@ class RedditPost(BaseModel):
 class RedditPicture(BaseModel):
     url: HttpUrl
     post_url: HttpUrl
-    time: datetime
-    picture_id: UUID
+    created_at: datetime
 
+    class Config:
+        orm_mode = True
