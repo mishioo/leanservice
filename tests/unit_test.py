@@ -10,6 +10,9 @@ from hypothesis import assume, given
 from hypothesis import strategies as st
 from sqlalchemy.future import select
 
+# run all tests with async backend
+pytestmark = pytest.mark.asyncio
+
 
 @pytest.fixture
 def post_schema():

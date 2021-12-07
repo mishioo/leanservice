@@ -35,16 +35,6 @@ async def connection(database):
             yield session
 
 
-# run all tests with async backend
-pytestmark = pytest.mark.anyio
-
-
-# define backend for asynchronous tests
-@pytest.fixture(autouse=True)
-def anyio_backend():
-    return "asyncio"
-
-
 @pytest.fixture(scope="module")
 def picture_post():
     return {

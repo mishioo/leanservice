@@ -6,6 +6,9 @@ from fastapi.testclient import TestClient
 from leanservice.database import get_database
 from leanservice.main import app
 
+# run all tests with async backend
+pytestmark = pytest.mark.asyncio
+
 
 @pytest.fixture
 def client(database):
