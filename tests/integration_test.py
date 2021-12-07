@@ -63,3 +63,21 @@ def sub_does_not_exist(mockresp):
 async def test_sub_with_pics(client, picture_post):
     resp = client.get("/random")
     assert resp.json()["url"] == picture_post["data"]["url"]
+
+
+@pytest.mark.usefixtures("sub_without_pics")
+async def test_sub_without_pics(client):
+    resp = client.get("/random")
+    assert resp.code == 204
+
+
+@pytest.mark.usefixtures("sub_does_not_exist")
+async def test_sub_does_not_exist(client):
+    resp = client.get("/random")
+    assert resp.code == 404
+
+
+async def test_history_empty(client):
+    resp = client.get("/history")
+    assert resp.code == 200
+    assert resp.json() == []
