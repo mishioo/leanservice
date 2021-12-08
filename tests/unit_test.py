@@ -3,11 +3,11 @@ from datetime import datetime
 from random import shuffle
 
 import pytest
+from hypothesis import assume, given
+from hypothesis import strategies as st
 from leanservice import crud
 from leanservice.models import RedditPicture
 from leanservice.routers.random import get_picture_posts
-from hypothesis import assume, given
-from hypothesis import strategies as st
 from sqlalchemy.future import select
 
 # run all tests with async backend
@@ -33,7 +33,7 @@ async def test_add_to_history(database, post_schema):
             result = await crud.add_to_history(session, post_schema)
     assert result.url == post_schema.url
     assert result.post_url == post_schema.post_url
-    assert pre_time < result.created_at < datetime.now()
+    assert pre_time <= result.created_at <= datetime.now()
     async with database() as session:
         async with session.begin():
             # need to open a new connection after commit in crud.add_to_history
