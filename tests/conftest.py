@@ -1,7 +1,13 @@
 """Provides pytest fixtures and configuration available for all tests in current module.
 """
 
+import os
 import pathlib
+
+# DATABASE_URL must be provided, setting a mock value
+# actual db instance will be created separately for each test
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///test.db"
+os.environ["ENV"] = "TEST"
 
 import pytest
 from leanservice.database import Base
