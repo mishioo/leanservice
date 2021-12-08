@@ -75,6 +75,16 @@ def sub_does_not_exist(mockresp):
     )
 
 
+# just a few, ap tests for any >500
+@pytest.fixture(params=list(range(500, 505)))
+def reddit_down(mockresp, request):
+    mockresp.get(
+        ANY_REDDIT_CRE,
+        payload={"message": "Server-side error", "error": request.param},
+        status=request.param,
+    )
+
+
 @pytest.fixture
 def sub_is_private(mockresp):
     mockresp.get(
@@ -123,6 +133,12 @@ async def test_sub_redirect_to_search(client):
 async def test_sub_does_not_exist(client):
     resp = client.get("/random")
     assert resp.status_code == 404
+
+
+@pytest.mark.usefixtures("reddit_down")
+async def test_reddit_down(client):
+    resp = client.get("/random")
+    assert resp.status_code == 503
 
 
 @pytest.mark.usefixtures("sub_is_private")
