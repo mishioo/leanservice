@@ -1,0 +1,27 @@
+version: 0.1-{branch}-{build}
+
+image:
+  - Visual Studio 2019
+  - Ubuntu
+
+stack: python 3.9
+
+environment:
+  PYTHON: "C:\\Python39"
+  COVERALLS_REPO_TOKEN:
+    secure: AMQEAgDtt+/+VMA2Y7aPwx5iCa9X1MF1Ig1tWmAGSZl7kDmjxN3MK9MV0X0JW1ip
+
+init:
+  - cmd: set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+
+build: false
+
+install:
+  - python -m pip install -U pip
+  - python -m pip install -r requirements-test.txt
+
+test_script:
+  - python -m pytest --cov=leanservice tests
+
+after_test:
+  - coveralls
