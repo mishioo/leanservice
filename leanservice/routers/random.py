@@ -30,7 +30,7 @@ async def fetch_subreddit(subreddit: str, listing: str) -> dict:
     Returns
     -------
     dict
-        Reddit's response in JSON format, converted to Pyhton's dict.
+        Reddit's response in JSON format, converted to Python's dict.
     """
     listing_url = f"http://www.reddit.com/r/{subreddit}/{listing}.json"
     params = {"limit": "100"}  # reddit's default is only 25, 100 is max
@@ -65,7 +65,7 @@ def get_picture_posts(response: dict) -> List[RedditPost]:
     Parameters
     ----------
     response : dict
-        Reddit's response in JSON format, converted to Pyhton's dict.
+        Reddit's response in JSON format, converted to Python's dict.
 
     Returns
     -------
