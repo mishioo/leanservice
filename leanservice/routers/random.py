@@ -4,7 +4,7 @@ from random import choice
 from typing import List, Optional
 
 import aiohttp
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm.session import Session
 
 from ..crud import add_to_history
@@ -36,8 +36,27 @@ async def fetch_subreddit(subreddit: str, listing: str) -> dict:
     params = {"limit": "100"}  # reddit's default is only 25, 100 is max
     async with aiohttp.ClientSession() as session:
         async with session.get(listing_url, params=params) as response:
-            if response.status == 200:
-                return await response.json()
+            if not "X-Moose" in response.headers:
+                logger.info("Where is the majestic Moose? :(")
+            if response.status == 404 or "subreddits/search" in response.url.path:
+                raise HTTPException(
+                    status.HTTP_404_NOT_FOUND,
+                    {"reason": f"no such subreddit: {subreddit}", "error": 404},
+                )
+            elif response.status == 403:
+                raise HTTPException(
+                    status.HTTP_403_FORBIDDEN,
+                    {"reason": f"this subreddit is private: {subreddit}", "error": 403},
+                )
+            elif response.status >= 500:
+                # for such a simple app we will just say its unavailable,
+                # if reddit responses with server error
+                raise HTTPException(
+                    status.HTTP_503_SERVICE_UNAVAILABLE,
+                    {"reason": {"reddit_error": response.status}, "error": 503},
+                )
+            fetched = await response.json()
+            return fetched
 
 
 def get_picture_posts(response: dict) -> List[RedditPost]:
@@ -62,8 +81,7 @@ def get_picture_posts(response: dict) -> List[RedditPost]:
     return picture_posts
 
 
-# TODO: handle empty lists and non-existant subreddits
-@router.get("/random", response_model=RedditPicture)
+@router.get("/random", response_model=Optional[RedditPicture])
 async def random(
     sub: Optional[str] = None,
     listing: Optional[Listing] = None,
@@ -73,10 +91,17 @@ async def random(
     """/random endpoint's GET method.
     Returns a JSON representation of random picture from reddit.
     """
-    fetched = await fetch_subreddit(
-        subreddit=sub or config.DEFAULT_SUBREDDIT,
-        listing=listing or config.DEFAULT_LISTING,
-    )
+    subreddit = sub or config.DEFAULT_SUBREDDIT
+    listing = listing or config.DEFAULT_LISTING
+    fetched = await fetch_subreddit(subreddit, listing)
     posts = get_picture_posts(fetched)
+    if not posts:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            {
+                "reason": f"no picture posts found in {subreddit}/{listing}",
+                "error": 404,
+            },
+        )
     post = choice(posts)  # chose at random
     return await add_to_history(db, post)
