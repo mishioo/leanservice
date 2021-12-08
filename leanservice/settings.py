@@ -33,7 +33,7 @@ class Listing(Enum):
         # will only impact instantiation with `Enum(value)` syntax
         # but that's exactly what we need for validation with pydantic
         for member in cls:
-            if member.value == value.upper():
+            if member.value == value.lower():
                 return member
 
 

@@ -8,6 +8,7 @@ from hypothesis import strategies as st
 from leanservice import crud
 from leanservice.models import RedditPicture
 from leanservice.routers.random import get_picture_posts
+from leanservice.settings import Listing
 from sqlalchemy.future import select
 
 # run all tests with async backend
@@ -50,3 +51,13 @@ async def test_get_picture_posts(picture_post, no_picture_post, num_pp, num_npp)
     shuffle(children)  # shuffles in-place, randomization controlled by hypothesis
     listing = {"kind": "Listing", "data": {"children": children}}
     assert len(get_picture_posts(listing)) == num_pp
+
+
+@pytest.mark.parametrize("member", Listing)
+def test_listing_str(member):
+    assert str(member) == member.value
+
+
+@pytest.mark.parametrize("member", Listing)
+def test_listing_lower(member):
+    assert Listing(member.value.upper()) == member
