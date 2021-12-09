@@ -34,6 +34,7 @@ popularną bibliotekę ORM [SQLAlchemy](https://www.sqlalchemy.org/).
     ```bash
     sudo add-apt-repository universe
     sudo apt update
+    sudo apt install git
     sudo apt install python3-pip
     sudo apt install python3-venv
     git clone https://github.com/mishioo/leanservice.git
@@ -45,15 +46,16 @@ popularną bibliotekę ORM [SQLAlchemy](https://www.sqlalchemy.org/).
     uvicorn leanservice.main:app
     ```
 
-1. Zainstaluj manager paczek Pythona (pip):
+1. Zainstaluj `git` i manager paczek Pythona (`pip`):
 
     ```
     sudo add-apt-repository universe
     sudo apt update
+    sudo apt install git
     sudo apt install python3-pip
     ```
-    W podstawowej dystrybucji Ubuntu nie znajduje się `pip`, a jest niezbędny do
-    instalacji dodatkowych paczek z PyPI.
+    W podstawowej dystrybucji Ubuntu nie znajduje się `git` potrzebny do sklonowania
+    repozytorium, ani `pip` niezbędny do instalacji dodatkowych paczek z PyPI.
 
 2. Sklonuj repozytorium z aplikacją:
 
