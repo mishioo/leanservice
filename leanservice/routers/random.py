@@ -34,8 +34,10 @@ async def fetch_subreddit(subreddit: str, listing: str) -> dict:
     """
     listing_url = f"http://www.reddit.com/r/{subreddit}/{listing}.json"
     params = {"limit": "100"}  # reddit's default is only 25, 100 is max
+    logger.debug(f"Sending request to {listing_url}")
     async with aiohttp.ClientSession() as session:
         async with session.get(listing_url, params=params) as response:
+            logger.debug(f"Reddit's response: {response}")
             if not "X-Moose" in response.headers:
                 logger.info("Where is the majestic Moose? :(")
             if response.status == 404 or "subreddits/search" in response.url.path:
