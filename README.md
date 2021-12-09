@@ -42,7 +42,7 @@ popularną bibliotekę ORM [SQLAlchemy](https://www.sqlalchemy.org/).
     python3 -m venv venv
     source venv/bin/activate
     python -m pip install -r requirements.txt
-    echo "DATABASE_URL=sqlite+aiosqlite:////./history.db" > .env
+    echo "DATABASE_URL=sqlite+aiosqlite:///./history.db" > .env
     uvicorn leanservice.main:app
     ```
 
@@ -92,8 +92,7 @@ popularną bibliotekę ORM [SQLAlchemy](https://www.sqlalchemy.org/).
     `dialect+driver://username:password@host:port/database`. Domyślnym dialektem i
     silnikiem są `sqlite+aiosqlite`, w przypadku użycia innych może wystąpić potrzeba
     zainstalowania dodatkowego oprogramowania. Przykładowy adres dla uruchomienia
-    lokalnego to: `sqlite+aiosqlite:////./history.db` (`sqlite+aiosqlite:///` dla
-    Windows).
+    lokalnego to: `sqlite+aiosqlite:///./history.db`.
 
     Podanie adresu bazy danych jest obowiązkowe, dodatkowo plik konfiguracyjny może
     zawierać następujące wartości:
